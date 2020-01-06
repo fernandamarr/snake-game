@@ -13,7 +13,7 @@ const randomPosition = () => {
 
 const initialState = {
   food: randomPosition(),
-  speed: 500,
+  speed: 300,
   direction: 'right',
   snake: [
     [0,0],
@@ -31,6 +31,8 @@ class App extends Component {
 
   componentDidUpdate() {
     this.checkBorders();
+    this.checkCollapse();
+    this.checkIfEat();
   }
 
   onKeyDown = (e) => {
@@ -83,6 +85,45 @@ class App extends Component {
     let head = this.state.snake[this.state.snake.length - 1];
     if (head[0] >= 100 || head[1] >= 100 || head[0] < 0 || head[1] < 0) {
       this.gameOver();
+    }
+  }
+
+  checkCollapse() {
+    let snake = [...this.state.snake];
+    let head = snake[snake.length - 1];
+    snake.pop();
+    snake.forEach(dot => {
+      if (head[0] === dot[0] && head[1] === dot[1]) {
+        this.gameOver();
+      }
+    })
+  }
+
+  checkIfEat() {
+    let head = this.state.snake[this.state.snake.length -1];
+    let food = this.state.food;
+    if (head[0] === food[0] && head[1] === food[1]) {
+      this.setState({
+        food: randomPosition(),
+      })
+      this.growSnake();
+      this.increaseSpeed();
+    }
+  }
+
+  growSnake() {
+    let grow = [...this.state.snake];
+    grow.unshift([]);
+    this.setState({
+      snake: grow
+    })
+  } 
+
+  increaseSpeed() {
+    if(this.state.speed > 10) {
+      this.setState({
+        speed: this.state.speed - 40
+      })
     }
   }
 
